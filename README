@@ -1,0 +1,12 @@
+这里是为大文件传输设计的，最大传输大小为2-3M。
+就两个节点互传。client和gateway_on_mars。
+里面的文件用来替换原本ICN over DTN中的client和gateway_on_mars中的文件。
+
+要注意几点：
+1.所有的sock文件都必须777模式，以及own必须是用户而不是root，
+2.如果要作为仓库，ccn-lite-relay中一定要家参数-d 后面跟仓库地址。
+3.对于ICN和DTN之间的文件传递改用共享文件存储，利用Unix socket传递一个0字节通知对方文件准备好了。且如果换了机器/环境，文件的路径要在代码中重新设置。
+4.文件大小限制于：a) ccn-lite-mkC中的body和out数组只能3M：3*1024*1024，无法制作更大的，ccnl-defs.h中CCNL_MAX_PACKET_SIZE只能2M:2097152，不然会报错，段核心存储错误
+		 b)bpchat中recvBundles和sendBundles的buffer大小，笔记本上只能是5M：5*1024*1024，台式机10M。
+		 c) ccn-lite-peek中，out数组大小限制，out用来存储read DTN接受到的文件，out=[3*CCNL_MAX_PACKET_SIZE],ccnl-defs.h中CCNL_MAX_PACKET_SIZE只能2M:2097152，该选项会干扰到文件大小，但目前2-3M的文件
+                   大小还有由于a,b限制的。
